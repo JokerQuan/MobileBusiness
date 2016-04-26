@@ -1,0 +1,75 @@
+<resources>
+    <string name="app_name">智慧商圈</string>
+    <string name="settings">设置</string>
+    <string name="logout">退出登录</string>
+    <string name="introduce">网上生活服务平台</string>
+
+    <string name="username">用户名</string>
+    <string name="password">密码(最长16位)</string>
+    <string name="login_password">密码</string>
+    <string name="repassword">确认密码</string>
+    <string name="gender">性别</string>
+    <string name="login">登录</string>
+    <string name="error_userorpsw">用户名或密码错误！</string>
+    <string name="forget">忘记密码</string>
+    <string name="register">注册</string>
+    <string name="verify">验证</string>
+    <string name="nextstep">下一步</string>
+    <string name="phone">手机号码</string>
+    <string name="verifycode">验证码</string>
+    <string name="error_number">输入的手机号格式不正确！</string>
+    <string name="user_exists">该用户名已经注册，请直换一个名字试试！</string>
+    <string name="phone_exist">该手机号码已被绑定！</string>
+    <string name="pw_tooshort">密码长度不够！（至少6位）</string>
+    <string name="pw_notsame">两次输入的密码不一样！</string>
+    <string name="not_phone">请输入正确的手机号码！</string>
+    <string name="register_toomuch">注册成功！请直接登录！</string>
+    <string name="register_success">注册成功！</string>
+    <string name="login_success">登录成功！</string>
+    <string name="error_username">用户名格式错误！</string>
+    <string name="not_space">用户名不能包含空格！</string>
+
+    <string name="usernameFormat">qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890</string>
+
+    <string name="name_tooshort">用户名必须大于6个字符！</string>
+    <string name="name_toolong">用户名必须小于20个字符！</string>
+    <string name="start_num">用户名必须以字母开头！</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
+    <string name="secrecy">保密</string>
+    <string name="age">年龄</string>
+    <string name="age_null">必须填写年龄！</string>
+
+    <string name="null_user">用户不存在！</string>
+    <string name="null_username">请输入用户名！</string>
+    <string name="logining">正在登录...</string>
+    <string name="submiting">正在提交...</string>
+
+    <string name="home">首页</string>
+    <string name="new_active">最新活动</string>
+    <string name="old_active">往期活动</string>
+    <string name="encounter">偶遇</string>
+    <string name="online_now">当前在线</string>
+    <string name="encounted">偶遇过的朋友</string>
+    <string name="im_here">我在现场</string>
+    <string name="upload_img">上传图片</string>
+    <string name="smart_life">慧生活</string>
+    <string name="find_business">找商家</string>
+    <string name="find_product">找产品</string>
+    <string name="win_record">中奖纪录</string>
+    <string name="more">更多</string>
+    <string name="about">关于</string>
+    <string name="press_onemore">再按一次返回键退出程序！</string>
+
+    <string name="ok">确认</string>
+
+    <string name="head">头像</string>
+    <string name="nickname">昵称</string>
+    <string name="signature">个性签名</string>
+    <string name="other">其他</string>
+
+
+
+    <string name="about_content">&#160;&#160;"重庆智慧商圈"是重庆市商委和市经信委开发的新型商业服务模式，是继水、电、气、交通之后的第五大城市基础设施项目，有力地推动信息技术与传统商业、现代服务业的融合。\n\n\n\n\n&#160;&#160;此app是栓栓栓同学的毕业设计作品！</string>
+
+</resources>
