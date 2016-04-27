@@ -32,7 +32,7 @@
             android:background="@drawable/btn_selector"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            android:text="发送"/>
+            android:text="@string/send"/>
     </LinearLayout>
 
 </RelativeLayout>
