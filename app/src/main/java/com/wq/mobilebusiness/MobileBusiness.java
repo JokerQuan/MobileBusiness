@@ -66,8 +66,8 @@ public class MobileBusiness extends Application {
         super.onCreate();
         context = getApplicationContext();
         AVOSCloud.initialize(this,
-                "5VAA4ngv7eBsuyxU3C6gkwcD-gzGzoHsz",
-                "u41y0IaqOAsLwOiIml7V588e");
+                "appid",
+                "appkey");
         //注册默认的消息处理逻辑
         AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
     }
