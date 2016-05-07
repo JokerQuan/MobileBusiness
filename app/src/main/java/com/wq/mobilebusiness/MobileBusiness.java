@@ -19,6 +19,7 @@ import com.wq.mobilebusiness.home.encounter.chat.ChatEvent;
 import de.greenrobot.event.EventBus;
 
 /**
+ *
  * Created by 王铨 on 2016/3/30.
  */
 public class MobileBusiness extends Application {
@@ -43,7 +44,7 @@ public class MobileBusiness extends Application {
                     //Notifycation
                     sendNotifycation(message,conversation);
                 }else {
-                    client.close(null);
+//                    client.close(null);
                 }
             }
         }

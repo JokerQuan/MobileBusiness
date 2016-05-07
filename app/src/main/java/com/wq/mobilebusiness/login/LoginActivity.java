@@ -89,6 +89,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         if (username.equals("")){
             //如果没有输入用户名，提示用户输入
             T.showShort(LoginActivity.this,R.string.null_username);
+            mButtonLogin.setEnabled(true);
+            mButtonLogin.setText(R.string.login);
         }else {
             //使用Leancloud提供的AVUser类实现异步登录
             AVUser.logInInBackground(username, password, new LogInCallback<AVUser>() {

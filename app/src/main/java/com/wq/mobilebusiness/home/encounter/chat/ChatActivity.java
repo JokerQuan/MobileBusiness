@@ -11,7 +11,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.AVUser;
+import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
@@ -63,6 +67,7 @@ public class ChatActivity extends Activity {
         String title = getIntent().getStringExtra("username");
         mToolBar.setTitle("与 " + title + " 偶遇");
 
+        initRecyclerView();
 
         mEditChat = (EditText) findViewById(R.id.et_chat);
         mButtonSend = (Button) findViewById(R.id.btn_send);
@@ -79,45 +84,62 @@ public class ChatActivity extends Activity {
             }
         });
 
-//        initView();
-
-        initRecyclerView();
+        getHistory();
 
     }
 
-//    private void initView() {
-//        final AVUser from = AVUser.getCurrentUser();
-//        AVIMClient tom = AVIMClient.getInstance(from.getUsername());
-//        tom.open(new AVIMClientCallback() {
-//
-//            @Override
-//            public void done(AVIMClient client, AVIMException e) {
-//                if (e == null) {
-//                    //登录成功
-//                    AVIMConversation conv = client.getConversation("57134b8639b057006bd048da");
-//                    conv.queryMessages(new AVIMMessagesQueryCallback() {
-//                        @Override
-//                        public void done(List<AVIMMessage> messages, AVIMException e) {
-//                            if (e == null) {
-//                                //成功获取最新10条消息记录
-//                                for (AVIMMessage message: messages) {
-//                                    AVIMTextMessage msg = (AVIMTextMessage) message;
-//                                    String headUrl = from.getAVFile("head").getUrl();
-//                                    String name = msg.getFrom();
-//                                    String time = String.valueOf(msg.getTimestamp());
-//                                    String content = msg.getText();
-//                                    Chat chat = new Chat(name,headUrl,time,content);
-//                                    mAdapter.addData(chat);
-//                                }
-//                            }
-//                        }
-//                    });
-//                }else {
-//                    Log.d("--------", "done: 获取失败");
-//                }
-//            }
-//        });
-//    }
+    private void getHistory() {
+        final AVUser from = AVUser.getCurrentUser();
+        AVIMClient tom = AVIMClient.getInstance(from.getUsername());
+        tom.open(new AVIMClientCallback() {
+
+            @Override
+            public void done(final AVIMClient client, final AVIMException e) {
+                if (e == null) {
+                    //登录成功
+                    String me = AVUser.getCurrentUser().getUsername();
+                    final String to = getIntent().getStringExtra("username");
+                    AVQuery<AVObject> conv1 = new AVQuery<>("_Conversation");
+                    conv1.whereEqualTo("name",me + "&" + to);
+                    AVQuery<AVObject> conv2 = new AVQuery<>("_Conversation");
+                    conv2.whereEqualTo("name",to + "&" + me);
+
+                    AVQuery<AVObject> query = AVQuery.or(Arrays.asList(conv1,conv2));
+                    query.findInBackground(new FindCallback<AVObject>() {
+                        @Override
+                        public void done(List<AVObject> list, AVException e) {
+                            if (e == null) {
+                                if (list.size() > 0) {//如果对话存在
+                                    AVIMConversation conv = client.getConversation(list.get(0).getObjectId());
+                                    conv.queryMessages(new AVIMMessagesQueryCallback() {
+                                        @Override
+                                        public void done(List<AVIMMessage> messages, AVIMException e) {
+                                            if (e == null) {
+                                                //成功获取最新20条消息记录
+                                                for (AVIMMessage message : messages) {
+                                                    AVIMTextMessage msg = (AVIMTextMessage) message;
+                                                    String headUrl = from.getAVFile("head").getUrl();
+                                                    String name = msg.getFrom();
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.CHINA);
+                                                    String time = sdf.format(new Date(msg.getTimestamp()));
+                                                    String content = msg.getText();
+                                                    Chat chat = new Chat(name, headUrl, time, content);
+                                                    mAdapter.addData(chat);
+                                                    mRecyclerView.smoothScrollToPosition(mChats.size()+1);
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }else {
+                    Log.d("--------", "done: 获取失败");
+                }
+            }
+        });
+    }
 
     private void initRecyclerView() {
         mRecyclerView = (RecyclerView)findViewById(R.id.rv_chat);
@@ -128,6 +150,7 @@ public class ChatActivity extends Activity {
         //创建并设置Adapter
         mAdapter = new ChatAdapter(this,mChats);
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.smoothScrollToPosition(mChats.size()+1);
     }
 
     /**
@@ -135,64 +158,123 @@ public class ChatActivity extends Activity {
      */
     public void sendMessageToSbFromMe() {
         final AVUser from = AVUser.getCurrentUser();
-        final String to = getIntent().getStringExtra("username");
+        final String myname = from.getUsername();
         AVIMClient me = AVIMClient.getInstance(from.getUsername());
         me.open(new AVIMClientCallback() {
             @Override
             public void done(final AVIMClient client, AVIMException e) {
                 if (e == null) {
-                    // 创建与Jerry之间的对话
-                    client.createConversation(Arrays.asList(to), "me & " + to, null,
-                            new AVIMConversationCreatedCallback() {
-                                @Override
-                                public void done(AVIMConversation conversation, AVIMException e) {
-                                    if (e == null) {
-                                        final AVIMTextMessage msg = new AVIMTextMessage();
-                                        msg.setText(mEditChat.getText().toString().trim());
-                                        // 发送消息
-                                        conversation.sendMessage(msg, new AVIMConversationCallback() {
-                                            @Override
-                                            public void done(AVIMException e) {
-                                                if (e == null) {
-                                                    //清空输入框信息
-                                                    mEditChat.setText("");
-                                                    //把对话添加到对话框中
-                                                    String headUrl = "";
-                                                    if (from.getAVFile("head") == null){
-                                                        headUrl = DEFAULT_IMGURL;
-                                                    } else {
-                                                        headUrl = from.getAVFile("head").getUrl();
-                                                    }
-                                                    String name = msg.getFrom();
-                                                    SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.CHINA);
-                                                    String time = sdf.format(new Date(msg.getTimestamp()));
-                                                    String content = msg.getText();
-                                                    Chat chat = new Chat(name,headUrl,time,content);
-                                                    mAdapter.addData(chat);
-                                                    client.close(null);
-                                                    mButtonSend.setEnabled(true);
-                                                }else {
-                                                    mButtonSend.setEnabled(true);
-                                                    client.close(null);
-                                                    Log.d("last", "done: "+e.getMessage());
-                                                    T.showShort(MobileBusiness.getContext(),"发送失败");
+                    //判断是否已存在两人之间的Conversation
+                    String me = AVUser.getCurrentUser().getUsername();
+                    final String to = getIntent().getStringExtra("username");
+                    AVQuery<AVObject> conv1 = new AVQuery<>("_Conversation");
+                    conv1.whereEqualTo("name",me + "&" + to);
+                    AVQuery<AVObject> conv2 = new AVQuery<>("_Conversation");
+                    conv2.whereEqualTo("name",to + "&" + me);
+
+                    AVQuery<AVObject> query = AVQuery.or(Arrays.asList(conv1,conv2));
+                    query.findInBackground(new FindCallback<AVObject>() {
+                        @Override
+                        public void done(List<AVObject> list, AVException e) {
+                            if (e == null){
+                                if (list.size() > 0){//如果对话存在
+                                    AVIMConversation conv = client.getConversation(list.get(0).getObjectId());
+                                    final AVIMTextMessage msg = new AVIMTextMessage();
+                                    msg.setText(mEditChat.getText().toString().trim());
+                                    // 发送消息
+                                    conv.sendMessage(msg, new AVIMConversationCallback() {
+                                        @Override
+                                        public void done(AVIMException e) {
+                                            if (e == null) {
+                                                //清空输入框信息
+                                                mEditChat.setText("");
+                                                //把对话添加到对话框中
+                                                String headUrl = "";
+                                                if (from.getAVFile("head") == null){
+                                                    headUrl = DEFAULT_IMGURL;
+                                                } else {
+                                                    headUrl = from.getAVFile("head").getUrl();
                                                 }
+                                                String name = msg.getFrom();
+                                                SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.CHINA);
+                                                String time = sdf.format(new Date(msg.getTimestamp()));
+                                                String content = msg.getText();
+                                                Chat chat = new Chat(name,headUrl,time,content);
+                                                mAdapter.addData(chat);
+                                                mRecyclerView.smoothScrollToPosition(mChats.size()+1);
+//                                                    client.close(null);
+                                                mButtonSend.setEnabled(true);
+                                            }else {
+                                                mButtonSend.setEnabled(true);
+//                                                    client.close(null);
+                                                Log.d("last", "done: "+e.getMessage());
+                                                T.showShort(MobileBusiness.getContext(),"发送失败");
                                             }
-                                        });
-                                    }else {
-                                        mButtonSend.setEnabled(true);
-                                        client.close(null);
-                                        Log.d("conversation", "done: "+e.getMessage());
-                                    }
+                                        }
+                                    });
+                                }else {
+                                    // 创建与Jerry之间的对话
+                                    client.createConversation(Arrays.asList(to), myname + "&" + to, null,
+                                            new AVIMConversationCreatedCallback() {
+                                                @Override
+                                                public void done(AVIMConversation conversation, AVIMException e) {
+                                                    if (e == null) {
+                                                        final AVIMTextMessage msg = new AVIMTextMessage();
+                                                        msg.setText(mEditChat.getText().toString().trim());
+                                                        // 发送消息
+                                                        conversation.sendMessage(msg, new AVIMConversationCallback() {
+                                                            @Override
+                                                            public void done(AVIMException e) {
+                                                                if (e == null) {
+                                                                    //清空输入框信息
+                                                                    mEditChat.setText("");
+                                                                    //把对话添加到对话框中
+                                                                    String headUrl = "";
+                                                                    if (from.getAVFile("head") == null){
+                                                                        headUrl = DEFAULT_IMGURL;
+                                                                    } else {
+                                                                        headUrl = from.getAVFile("head").getUrl();
+                                                                    }
+                                                                    String name = msg.getFrom();
+                                                                    SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.CHINA);
+                                                                    String time = sdf.format(new Date(msg.getTimestamp()));
+                                                                    String content = msg.getText();
+                                                                    Chat chat = new Chat(name,headUrl,time,content);
+                                                                    mAdapter.addData(chat);
+                                                                    mRecyclerView.smoothScrollToPosition(mChats.size()+1);
+//                                                    client.close(null);
+                                                                    mButtonSend.setEnabled(true);
+                                                                }else {
+                                                                    mButtonSend.setEnabled(true);
+//                                                    client.close(null);
+                                                                    Log.d("last", "done: "+e.getMessage());
+                                                                    T.showShort(MobileBusiness.getContext(),"发送失败");
+                                                                }
+                                                            }
+                                                        });
+                                                    }else {
+                                                        mButtonSend.setEnabled(true);
+//                                        client.close(null);
+                                                        Log.d("conversation", "done: "+e.getMessage());
+                                                    }
+                                                }
+                                            });
                                 }
-                            });
+                            }else {
+                                Log.d("isExist", "done: e:"+e.getMessage());
+                                Log.d("isExist", "done: size:"+list.size());
+                            }
+                        }
+                    });
+
                 }else {
                     mButtonSend.setEnabled(true);
-                    client.close(null);
+//                    client.close(null);
                     Log.d("client", "done: "+e.getMessage());
                 }
             }
         });
+
     }
 
     /**
@@ -213,7 +295,9 @@ public class ChatActivity extends Activity {
         String content = text.getText();
         Chat chat = new Chat(name,headUrl,time,content);
         mAdapter.addData(chat);
-        client.close(null);
+//        client.close(null);
+
+        mRecyclerView.smoothScrollToPosition(mChats.size()+1);
     }
 
     @Override
