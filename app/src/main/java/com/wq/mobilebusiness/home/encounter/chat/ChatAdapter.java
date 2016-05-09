@@ -17,6 +17,7 @@ import com.wq.mobilebusiness.R;
 import java.util.List;
 
 /**
+ * 聊天数据Adapter
  * Created by 王铨 on 2016/4/17.
  */
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {

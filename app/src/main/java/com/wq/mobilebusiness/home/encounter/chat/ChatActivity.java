@@ -20,7 +20,6 @@ import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.AVIMMessage;
-import com.avos.avoscloud.im.v2.Conversation;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
@@ -84,6 +83,7 @@ public class ChatActivity extends Activity {
             }
         });
 
+        MobileBusiness.isOnChat=true;
         getHistory();
 
     }
@@ -295,8 +295,6 @@ public class ChatActivity extends Activity {
         String content = text.getText();
         Chat chat = new Chat(name,headUrl,time,content);
         mAdapter.addData(chat);
-//        client.close(null);
-
         mRecyclerView.smoothScrollToPosition(mChats.size()+1);
     }
 
@@ -304,5 +302,7 @@ public class ChatActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+
+        MobileBusiness.isOnChat = false;
     }
 }

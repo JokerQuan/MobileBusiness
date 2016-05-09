@@ -58,7 +58,7 @@ public class NotificationUtils {
   public static void showNotification(Context context, String title, String content, String sound, Intent intent) {
     intent.setFlags(0);
     int notificationId = title.hashCode();
-    PendingIntent contentIntent = PendingIntent.getBroadcast(context, notificationId, intent, 0);
+    PendingIntent contentIntent = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     NotificationCompat.Builder mBuilder =
       new NotificationCompat.Builder(context)
         .setSmallIcon(R.mipmap.ic_launcher)

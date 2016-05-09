@@ -23,6 +23,8 @@ import de.greenrobot.event.EventBus;
  * Created by 王铨 on 2016/3/30.
  */
 public class MobileBusiness extends Application {
+    public static String USER = "";
+    public static boolean isOnChat = false;
     private static Context context;
     public static Context getContext(){
         return context;
@@ -36,15 +38,15 @@ public class MobileBusiness extends Application {
                 String myself = AVUser.getCurrentUser().getUsername();
                 //过滤自己发送的消息
                 if (!message.getFrom().equals(myself)){
-//                    T.showShort(MobileBusiness.getContext(),
-//                            "来自"+message.getFrom()+"的消息:\n"
-//                                    +((AVIMTextMessage)message).getText());
                     //通知ChatActivity
+                    Log.d("Mobilebusiness", message.getFrom());
+                    Log.d("Mobilebusiness", myself);
                     EventBus.getDefault().post(new ChatEvent(message,conversation,client));
                     //Notifycation
-                    sendNotifycation(message,conversation);
-                }else {
-//                    client.close(null);
+                    if (!isOnChat){
+                        USER = message.getFrom();
+                        sendNotifycation(message,conversation);
+                    }
                 }
             }
         }
@@ -67,8 +69,8 @@ public class MobileBusiness extends Application {
         super.onCreate();
         context = getApplicationContext();
         AVOSCloud.initialize(this,
-                "appid",
-                "appkey");
+                "5VAA4ngv7eBsuyxU3C6gkwcD-gzGzoHsz",
+                "u41y0IaqOAsLwOiIml7V588e");
         //注册默认的消息处理逻辑
         AVIMMessageManager.registerDefaultMessageHandler(new CustomMessageHandler());
     }

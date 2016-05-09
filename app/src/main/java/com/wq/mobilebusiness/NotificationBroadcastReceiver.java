@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.avos.avoscloud.AVUser;
 import com.wq.mobilebusiness.home.MainActivity;
+import com.wq.mobilebusiness.home.encounter.chat.ChatActivity;
 import com.wq.mobilebusiness.login.LoginActivity;
 
 
@@ -62,9 +63,9 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
    * @param intent
    */
   private void gotoSingleChatActivity(Context context, Intent intent) {
-    Intent startActivityIntent = new Intent(context, MainActivity.class);
+    Intent startActivityIntent = new Intent(context, ChatActivity.class);
     startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivityIntent.putExtra(Constants.MEMBER_ID, intent.getStringExtra(Constants.MEMBER_ID));
+    startActivityIntent.putExtra("username", MobileBusiness.USER);
     context.startActivity(startActivityIntent);
   }
 }
